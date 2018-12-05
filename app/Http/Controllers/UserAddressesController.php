@@ -16,7 +16,6 @@ class UserAddressesController extends Controller
 
     /**
      * @param Request $request
-     *
      * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
      */
     public function index(Request $request)
@@ -38,9 +37,7 @@ class UserAddressesController extends Controller
     }
 
     /**
-     *
      * @param UserAddressRequest $request
-     *
      * @return \Illuminate\Http\RedirectResponse
      */
     public function store(UserAddressRequest $request)
@@ -56,5 +53,55 @@ class UserAddressesController extends Controller
         ]));
 
         return redirect()->route('user_addresses.index');
+    }
+
+    /**
+     * @param \App\Models\UserAddress $user_address
+     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
+     * @throws \Illuminate\Auth\Access\AuthorizationException
+     */
+    public function edit(UserAddress $user_address)
+    {
+        $this->authorize('own', $user_address);
+
+        return view('user_addresses.create_and_edit',
+            ['address' => $user_address]);
+    }
+
+    /**
+     * @param \App\Models\UserAddress               $user_address
+     * @param \App\Http\Requests\UserAddressRequest $request
+     * @return \Illuminate\Http\RedirectResponse
+     * @throws \Illuminate\Auth\Access\AuthorizationException
+     */
+    public function update(UserAddress $user_address, UserAddressRequest $request)
+    {
+        $this->authorize('own', $user_address);
+
+        $user_address->update($request->only([
+            'province',
+            'city',
+            'district',
+            'addresses',
+            'zip',
+            'contact_name',
+            'contact_phone',
+        ]));
+
+        return redirect()->route('user_addresses.index');
+    }
+
+    /**
+     * @param \App\Models\UserAddress $user_address
+     * @return array
+     * @throws \Illuminate\Auth\Access\AuthorizationException
+     */
+    public function destroy(UserAddress $user_address)
+    {
+        $this->authorize('own', $user_address);
+
+        $user_address->delete();
+
+        return [];
     }
 }
