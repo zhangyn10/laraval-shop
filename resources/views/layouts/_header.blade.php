@@ -44,6 +44,9 @@
                                     {{ csrf_field() }}
                                 </form>
                             </li>
+                            <li>
+                                <a href="{{ route('products.favorites') }}">我的收藏</a>
+                            </li>
                         </ul>
                     </li>
                 @endguest

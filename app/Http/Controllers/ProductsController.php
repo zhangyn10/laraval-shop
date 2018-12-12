@@ -36,7 +36,7 @@ class ProductsController extends Controller
     public function show(Product $product, Request $request)
     {
         // 判断商品是否已下架，如果没有上架则抛出异常
-        if (!$product->on_sale) {
+        if ( ! $product->on_sale) {
             throw new InvalidRequestException('商品未上架');
         }
 
@@ -48,11 +48,15 @@ class ProductsController extends Controller
             $favored = boolval($user->favoriteProducts()->find($product->id));
         }
 
-        return view('products.show', ['product' => $product, 'favored' => $favored]);
+        return view('products.show', [
+            'product' => $product,
+            'favored' => $favored,
+        ]);
     }
 
     /**
      * 收藏
+     *
      * @param \App\Models\Product        $product
      * @param \App\Http\Requests\Request $request
      * @return array
@@ -79,5 +83,12 @@ class ProductsController extends Controller
         $user->favoriteProducts()->detach($product);
 
         return [];
+    }
+
+    public function favorites(Request $request)
+    {
+        $products = $request->user()->favoriteProducts()->paginate(16);
+
+        return view('products.favorites', ['products' => $products]);
     }
 }
