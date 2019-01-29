@@ -20,9 +20,12 @@
             <ul class="nav navbar-nav navbar-right">
                 <!-- 登录注册链接开始 -->
                 @guest
-                    <li><a href="{{ route('login') }}">登录</a></li>
-                    <li><a href="{{ route('register') }}">注册</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{{ route('login') }}">登录</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{{ route('register') }}">注册</a></li>
                 @else
+                    <li class="nav-item">
+                        <a href="{{ route('cart.index') }}" class="nav-link mt-1"><i class="fa fa-shopping-cart"></i></a>
+                    </li>
                     <li class="dropdown">
                         <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
                             <span class="user-avatar pull-left" style="margin-right:8px; margin-top:-5px;">

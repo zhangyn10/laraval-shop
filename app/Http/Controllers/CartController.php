@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\AddCardRequest;
 use App\Models\CartItem;
+use App\Models\ProductSku;
 use Illuminate\Http\Request;
 
 class CartController extends Controller
@@ -29,6 +30,31 @@ class CartController extends Controller
             $cart->productSku()->associate($skuId);
             $cart->save();
         }
+
+        return [];
+    }
+
+    /**
+     * 购物车列表页
+     * @param \Illuminate\Http\Request $request
+     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
+     */
+    public function index(Request $request)
+    {
+        $cartItems = $request->user()->cartItems()->with(['productSku.product'])->get();
+
+        return view('cart.index', ['cartItems' => $cartItems]);
+    }
+
+    /**
+     * 删除购物车
+     * @param \App\Models\ProductSku   $sku
+     * @param \Illuminate\Http\Request $request
+     * @return array
+     */
+    public function remove(ProductSku $sku, Request $request)
+    {
+        $request->user()->cartItems()->where('product_sku_id', $sku->id)->delete();
 
         return [];
     }
