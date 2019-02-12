@@ -30,25 +30,17 @@ class AddCardRequest extends FormRequest
                 'required',
                 function ($attribute, $value, $fail) {
                     if ( ! $sku = ProductSku::find($value)) {
-                        $fail = '该商品不存在';
-
-                        return;
+                        return $fail('该商品不存在');
                     }
                     if ( ! $sku->product->on_sale) {
-                        $fail = '该商品未上架';
-
-                        return;
+                        return $fail('该商品未上架');
                     }
                     if ($sku->stock === 0) {
-                        $fail = '该商品已售完';
-
-                        return;
+                        return $fail('该商品已售完');
                     }
                     if ($this->input('amount') > 0 &&
                         $sku->stock < $this->input('amount')) {
-                        $fail = '该商品库存不足';
-
-                        return;
+                        return $fail('该商品库存不足');
                     }
                 },
             ],
