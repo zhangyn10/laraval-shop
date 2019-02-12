@@ -33,9 +33,13 @@
                             </span>
                             {{ Auth::user()->name }} <span class="caret"></span>
                         </a>
-                        <ul class="dropdown-menu" role="menu">
+                        <ul class="dropdown-menu" role="menu" aria-labelledby="navbarDropdown">
                             <li>
                                 <a href="{{ route('user_addresses.index') }}">收货地址</a>
+                                <a href="{{ route('orders.index') }}" class="dropdown-item">我的订单</a>
+                            </li>
+                            <li>
+                                <a href="{{ route('products.favorites') }}">我的收藏</a>
                             </li>
                             <li>
                                 <a href="{{ route('logout') }}"
@@ -46,9 +50,6 @@
                                 <form id="logout-form" action="{{ route('logout') }}" method="POST" style="display: none;">
                                     {{ csrf_field() }}
                                 </form>
-                            </li>
-                            <li>
-                                <a href="{{ route('products.favorites') }}">我的收藏</a>
                             </li>
                         </ul>
                     </li>
