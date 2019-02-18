@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Exceptions\InvalidRequestException;
 use App\Models\Order;
 use Carbon\Carbon;
+use Endroid\QrCode\QrCode;
 use Illuminate\Http\Request;
 
 class PaymentController extends Controller
@@ -82,5 +83,65 @@ class PaymentController extends Controller
 
         return app('alipay')->success();
         //\Log::debug('Alipay notify', $data->all());
+    }
+
+    /**
+     * 微信支付
+     * @param \App\Models\Order        $order
+     * @param \Illuminate\Http\Request $request
+     * @return mixed
+     * @throws \App\Exceptions\InvalidRequestException
+     * @throws \Illuminate\Auth\Access\AuthorizationException
+     */
+    public function payByWechat(Order $order, Request $request)
+    {
+        // 校验权限
+        $this->authorize('own', $order);
+        // 检验订单状态
+        if ($order->paid_at || $order->closed) {
+            throw new InvalidRequestException('订单状态不正确');
+        }
+
+        // scan 方法为拉起微信扫码支付
+        $wechatOrder = app('wechat_pay')->scan([
+            'out_trade_no' => $order->no, // 商户订单流水号，与支付宝 out_trade_no 一样
+            'total_fee' => $order->total_amount * 100, // 与支付宝不同，微信支付的单位是分
+            'body' => '支付 我的商城 订单：' . $order->no, // 订单描述
+        ]);
+        // 把要转化的字符串作为 QrCode 的构造函数
+        $qrCode = new QrCode($wechatOrder->code_url);
+
+        // 将生成的二维码图片数据以字符串形式输出，并带上相应的相应类型
+        return response($qrCode->writeString(), 200, ['Content-Type' => $qrCode->getContentType()]);
+    }
+
+    /**
+     * 微信异步回调
+     * @return string
+     */
+    public function wechatNotify()
+    {
+        // 校验回调参数是否正确
+        $data = app('wechat_pay')->verify();
+        // 找到对应的订单
+        $order = Order::where('no', $data->order_trade_no)->first();
+        // 订单不存在则告知微信支付
+        if (!$order) {
+            return 'fail';
+        }
+        // 订单已支付
+        if ($order->paid_at) {
+            // 告知微信支付此订单已处理
+            return app('wechat_pay')->success();
+        }
+
+        // 将订单标记为已支付
+        $order->update([
+            'paid_at' => Carbon::now(),
+            'payment_method' => 'wechat',
+            'payment_no' => $data->transcation_id,
+        ]);
+
+        return app('wechat_pay')->success();
     }
 }
