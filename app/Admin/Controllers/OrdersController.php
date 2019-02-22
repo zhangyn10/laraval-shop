@@ -28,18 +28,18 @@ class OrdersController extends Controller
     }
 
     /**
-     * Show interface.
+     * 查看订单
      *
-     * @param mixed   $id
-     * @param Content $content
-     * @return Content
+     * @param \App\Models\Order            $order
+     * @param \Encore\Admin\Layout\Content $content
+     * @return \Encore\Admin\Layout\Content
      */
-    public function show($id, Content $content)
+    public function show(Order $order, Content $content)
     {
         return $content
-            ->header('Detail')
-            ->description('description')
-            ->body($this->detail($id));
+            ->header('查看订单')
+            //->description('description')
+            ->body(view('admin.orders.show', ['order' => $order]));
     }
 
     /**
