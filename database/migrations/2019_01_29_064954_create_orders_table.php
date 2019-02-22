@@ -21,7 +21,7 @@ class CreateOrdersTable extends Migration
             $table->text('address')->comment('JSON 格式的收货地址');
             $table->decimal('total_amount',10,2)->comment('订单总金额');
             $table->text('remark')->nullable()->comment('订单备注');
-            $table->dateTime('paid_id')->nullable()->comment('支付时间');
+            $table->dateTime('paid_at')->nullable()->comment('支付时间');
             $table->string('payment_method')->nullable()->comment('支付方式');
             $table->string('payment_no')->nullable()->comment('支付平台订单号');
             $table->string('refund_status')->default(\App\Models\Order::REFUND_STATUS_PENDING)->comment('退款状态');
